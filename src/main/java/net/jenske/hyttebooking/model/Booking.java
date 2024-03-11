@@ -11,14 +11,12 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long bookingId;
 
-    @Column
     private LocalDate startDate;
 
-    @Column
     private LocalDate endDate;
 
-    @Column
     private String status;
+    private String title;
 
     @ManyToOne
     @JoinColumn(name = "cabinId") // This is the foreign key
@@ -31,12 +29,20 @@ public class Booking {
     public Booking() {
     }
 
-    public Booking(LocalDate startDate, LocalDate endDate, String status, Cabin cabin, User user) {
+    public Booking(LocalDate startDate, LocalDate endDate, String status, String title , Cabin cabin, User user) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
         this.cabin = cabin;
         this.user = user;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public long getBookingId() {

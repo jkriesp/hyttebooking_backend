@@ -1,5 +1,6 @@
 package net.jenske.hyttebooking.controller;
 
+import net.jenske.hyttebooking.controller.exception.ResourceNotFoundException;
 import net.jenske.hyttebooking.model.Cabin;
 import net.jenske.hyttebooking.repository.CabinRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -51,17 +52,9 @@ public class CabinController {
      */
     @GetMapping("/cabins/{id}")
     public ResponseEntity<Cabin> getCabinById(@PathVariable("id") long id) {
-        try {
-            Optional<Cabin> cabin = cabinRepository.findById(id);
-
-            if (cabin.isPresent()) {
-                return new ResponseEntity<>(cabin.get(), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Cabin cabin = cabinRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cabin not found with id: " + id));
+        return ResponseEntity.ok(cabin);
     }
 
     /**
@@ -119,11 +112,9 @@ public class CabinController {
      */
     @DeleteMapping("/cabins/{id}")
     public ResponseEntity<HttpStatus> deleteCabin(@PathVariable("id") long id) {
-        try {
-            cabinRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Cabin cabin = cabinRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Cabin not found with id: " + id));
+        cabinRepository.delete(cabin);
+        return ResponseEntity.noContent().build();
     }
 }

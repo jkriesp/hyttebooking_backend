@@ -1,5 +1,6 @@
 package net.jenske.hyttebooking.controller;
 
+import net.jenske.hyttebooking.controller.exception.ResourceNotFoundException;
 import net.jenske.hyttebooking.model.User;
 import net.jenske.hyttebooking.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -52,17 +53,9 @@ public class UserController {
      */
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
-        try {
-            Optional<User> user = userRepository.findById(id);
-
-            if (user.isPresent()) {
-                return new ResponseEntity<>(user.get(), HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+            User user = userRepository.findById(id).
+                    orElseThrow(() -> new ResourceNotFoundException("User not found for this id: " + id));
+            return ResponseEntity.ok(user);
     }
 
     /**
@@ -112,11 +105,9 @@ public class UserController {
      */
     @DeleteMapping("/users/{id}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") long id) {
-        try {
-            userRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + id));
+        userRepository.delete(user);
+        return ResponseEntity.noContent().build();
     }
 }

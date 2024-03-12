@@ -1,5 +1,7 @@
 package net.jenske.hyttebooking.controller;
 
+import jakarta.validation.Valid;
+import net.jenske.hyttebooking.controller.exception.ResourceNotFoundException;
 import net.jenske.hyttebooking.model.Booking;
 import net.jenske.hyttebooking.model.Cabin;
 import net.jenske.hyttebooking.model.User;
@@ -61,13 +63,9 @@ public class BookingController {
      */
     @GetMapping("/bookings/{id}")
     public ResponseEntity<Booking> getBookingById(@PathVariable("id") long id) {
-        try {
-            Optional<Booking> booking = bookingRepository.findById(id);
-
-            return booking.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
-        } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + id));
+        return ResponseEntity.ok(booking);
     }
 
     /**
@@ -77,13 +75,13 @@ public class BookingController {
      * @return the newly created booking with a 201 status code, or an error message if the creation fails
      */
     @PostMapping("/bookings")
-    public ResponseEntity<?> createBooking(@RequestBody Booking booking) {
+    public ResponseEntity<?> createBooking(@Valid @RequestBody Booking booking) {
         try {
             Cabin cabin = cabinRepository.findById(booking.getCabin().getCabinId())
-                    .orElseThrow(() -> new Exception("Cabin not found with id: " + booking.getCabin().getCabinId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("Cabin not found with id: " + booking.getCabin().getCabinId()));
 
             User user = userRepository.findById(booking.getUser().getUserId())
-                    .orElseThrow(() -> new Exception("User not found with id: " + booking.getUser().getUserId()));
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + booking.getUser().getUserId()));
 
             Booking newBooking = new Booking(
                     booking.getStartDate(),
@@ -109,7 +107,7 @@ public class BookingController {
      * @return the updated booking, or a 404 status if the booking with the specified ID is not found
      */
     @PutMapping("/bookings/{id}")
-    public ResponseEntity<Booking> updateBooking(@PathVariable("id") long id, @RequestBody Booking bookingDetails) {
+    public ResponseEntity<Booking> updateBooking(@Valid @PathVariable("id") long id, @RequestBody Booking bookingDetails) {
         return bookingRepository.findById(id)
                 .map(existingBooking -> {
                     // Fetch and set the cabin and user from the database to ensure they exist
@@ -138,11 +136,9 @@ public class BookingController {
      */
     @DeleteMapping("/bookings/{id}")
     public ResponseEntity<HttpStatus> deleteBooking(@PathVariable("id") long id) {
-        try {
-            bookingRepository.deleteById(id);
-            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
-        } catch (Exception e) {
-            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
-        }
+        Booking booking = bookingRepository.findById(id)
+                .orElseThrow(() -> new ResourceNotFoundException("Booking not found with id: " + id));
+        bookingRepository.delete(booking);
+        return ResponseEntity.noContent().build();
     }
 }

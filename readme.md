@@ -44,7 +44,6 @@ The frontend component will be developed using React and will provide a user int
 
 ## API Documentation
 The REST API documentation is automatically generated via SpringDoc OpenAPI and can be accessed at `http://localhost:8080/swagger-ui.html` when the application is running.
-
 ## Development
 - Use the H2 database for development purposes. The H2 console can be accessed at `http://localhost:8080/h2-console`.
 - For production, configure the PostgreSQL database connection settings.

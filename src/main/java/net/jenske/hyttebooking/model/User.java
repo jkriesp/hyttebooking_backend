@@ -10,7 +10,11 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
-    private String name;
+    private String firstName;
+
+
+
+    private String lastName;
     private String email;
     // other fields as needed
 
@@ -22,8 +26,9 @@ public class User {
     public User() {
     }
 
-    public User(String name, String email) {
-        this.name = name;
+    public User(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
     }
 
@@ -33,16 +38,24 @@ public class User {
         return userId;
     }
 
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     public void setUserId(long userId) {
         this.userId = userId;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getEmail() {
@@ -63,6 +76,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", name=" + name + ", email=" + email + "]";
+        return "User [userId=" + userId + ", firstName=" + firstName + ", email=" + email + "]";
     }
 }

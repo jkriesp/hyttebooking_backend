@@ -1,7 +1,11 @@
 package net.jenske.hyttebooking.controller;
 
 import net.jenske.hyttebooking.model.Booking;
+import net.jenske.hyttebooking.model.Cabin;
+import net.jenske.hyttebooking.model.User;
 import net.jenske.hyttebooking.repository.BookingRepository;
+import net.jenske.hyttebooking.repository.CabinRepository;
+import net.jenske.hyttebooking.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +22,11 @@ public class BookingController {
 
     @Autowired
     BookingRepository bookingRepository;
+    @Autowired
+    private CabinRepository cabinRepository;
+
+    @Autowired
+    private UserRepository userRepository;
 
     @GetMapping("/bookings")
     public ResponseEntity<List<Booking>> getAllBookings(@RequestParam(required = false) String title) {
@@ -42,50 +51,66 @@ public class BookingController {
     @GetMapping("/bookings/{id}")
     public ResponseEntity<Booking> getBookingById(@PathVariable("id") long id) {
         try {
-            Booking booking = bookingRepository.findById(id);
+            Optional<Booking> booking = bookingRepository.findById(id);
 
-            if (booking != null) {
-                return new ResponseEntity<>(booking, HttpStatus.OK);
-            } else {
-                return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-            }
+            return booking.map(value -> new ResponseEntity<>(value, HttpStatus.OK)).orElseGet(() -> new ResponseEntity<>(HttpStatus.NOT_FOUND));
         } catch (Exception e) {
             return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PostMapping("/bookings")
-    public ResponseEntity<Booking> createBooking(@RequestBody Booking booking) {
+    public ResponseEntity<?> createBooking(@RequestBody Booking booking) {
         try {
+            // Check if the referenced cabin exists
+            Cabin cabin = cabinRepository.findById(booking.getCabin().getCabinId())
+                    .orElseThrow(() -> new Exception("Cabin not found with id: " + booking.getCabin().getCabinId()));
+
+            // Check if the referenced user exists
+            User user = userRepository.findById(booking.getUser().getUserId())
+                    .orElseThrow(() -> new Exception("User not found with id: " + booking.getUser().getUserId()));
+
+            // Before creating a new Booking, ensure the references to cabin and user are the ones fetched from the database
+            booking.setCabin(cabin);
+            booking.setUser(user);
+
+            // Create and save the booking
             Booking _booking = bookingRepository
-                    .save(new Booking(booking.getStartDate(), booking.getEndDate(), booking.getStatus(), booking.getTitle(), booking.getCabin(), booking.getUser()));
+                    .save(new Booking(
+                            booking.getStartDate(),
+                            booking.getEndDate(),
+                            booking.getStatus(),
+                            booking.getTitle(),
+                            booking.getCabin(),
+                            booking.getUser()));
             return new ResponseEntity<>(_booking, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     @PutMapping("/bookings/{id}")
-    public ResponseEntity<Booking> updateBooking(@PathVariable("id") long id, @RequestBody Booking booking) {
-        Optional<Booking> bookingData = Optional.ofNullable(bookingRepository.findById(id));
+    public ResponseEntity<Booking> updateBooking(@PathVariable("id") long id, @RequestBody Booking bookingDetails) {
+        return bookingRepository.findById(id)
+                .map(existingBooking -> {
+                    // Fetch and set the cabin and user from the database to ensure they exist
+                    cabinRepository.findById(bookingDetails.getCabin().getCabinId())
+                            .ifPresent(existingBooking::setCabin);
+                    userRepository.findById(bookingDetails.getUser().getUserId())
+                            .ifPresent(existingBooking::setUser);
 
-        if (bookingData.isPresent()) {
-            try {
-                Booking _booking = bookingRepository.findById(id);
-                _booking.setStartDate(booking.getStartDate());
-                _booking.setEndDate(booking.getEndDate());
-                _booking.setStatus(booking.getStatus());
-                _booking.setTitle(booking.getTitle());
-                _booking.setCabin(booking.getCabin());
-                _booking.setUser(booking.getUser());
-                return new ResponseEntity<>(bookingRepository.save(_booking), HttpStatus.OK);
-            } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
-            }
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
+                    // Update the existing booking with details from the request
+                    existingBooking.setStartDate(bookingDetails.getStartDate());
+                    existingBooking.setEndDate(bookingDetails.getEndDate());
+                    existingBooking.setStatus(bookingDetails.getStatus());
+                    existingBooking.setTitle(bookingDetails.getTitle());
+
+                    // Save the updated booking
+                    return new ResponseEntity<>(bookingRepository.save(existingBooking), HttpStatus.OK);
+                })
+                .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
+
 
     @DeleteMapping("/bookings/{id}")
     public ResponseEntity<HttpStatus> deleteBooking(@PathVariable("id") long id) {

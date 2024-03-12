@@ -28,6 +28,12 @@ public class BookingController {
     @Autowired
     private UserRepository userRepository;
 
+    /**
+     * Retrieves all bookings optionally filtered by title.
+     *
+     * @param title the title to filter the bookings, if provided
+     * @return a list of bookings that match the title filter or all bookings if no filter is provided
+     */
     @GetMapping("/bookings")
     public ResponseEntity<List<Booking>> getAllBookings(@RequestParam(required = false) String title) {
         try {
@@ -48,6 +54,11 @@ public class BookingController {
         }
     }
 
+    /**
+     * Retrieves a single booking by its unique identifier.
+     * @param id the unique identifier of the booking to be retrieved
+     * @return the booking with the specified ID or a not found response if it doesn't exist
+     */
     @GetMapping("/bookings/{id}")
     public ResponseEntity<Booking> getBookingById(@PathVariable("id") long id) {
         try {
@@ -59,6 +70,12 @@ public class BookingController {
         }
     }
 
+    /**
+     * Creates a new booking in the system.
+     *
+     * @param booking the booking object to be created
+     * @return the newly created booking with a 201 status code, or an error message if the creation fails
+     */
     @PostMapping("/bookings")
     public ResponseEntity<?> createBooking(@RequestBody Booking booking) {
         try {
@@ -84,7 +101,13 @@ public class BookingController {
         }
     }
 
-
+    /**
+     * Updates an existing booking.
+     *
+     * @param id the unique identifier of the booking to update
+     * @param bookingDetails the updated booking information
+     * @return the updated booking, or a 404 status if the booking with the specified ID is not found
+     */
     @PutMapping("/bookings/{id}")
     public ResponseEntity<Booking> updateBooking(@PathVariable("id") long id, @RequestBody Booking bookingDetails) {
         return bookingRepository.findById(id)
@@ -107,7 +130,12 @@ public class BookingController {
                 .orElse(new ResponseEntity<>(HttpStatus.NOT_FOUND));
     }
 
-
+    /**
+     * Deletes a booking from the system.
+     *
+     * @param id the unique identifier of the booking to be deleted
+     * @return a no content response if the deletion is successful, or a not found response if the booking doesn't exist
+     */
     @DeleteMapping("/bookings/{id}")
     public ResponseEntity<HttpStatus> deleteBooking(@PathVariable("id") long id) {
         try {

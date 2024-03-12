@@ -19,7 +19,11 @@ public class UserController {
     @Autowired
     UserRepository userRepository;
 
-
+    /**
+     * Gets all users.
+     *
+     * @return a list of users
+     */
     @GetMapping("/users")
     public ResponseEntity<List<User>> getAllUsers(@RequestParam(required = false) String email) {
         try {
@@ -40,6 +44,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Gets user by id.
+     *
+     * @param id the unique identifier of the user to be retrieved
+     * @return a list of users
+     */
     @GetMapping("/users/{id}")
     public ResponseEntity<User> getUserById(@PathVariable("id") long id) {
         try {
@@ -55,6 +65,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Creates a new user in the system.
+     *
+     * @param user the user object to be created
+     * @return the newly created user with a 201 status code, or an error message if the creation fails
+     */
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
@@ -66,6 +82,13 @@ public class UserController {
         }
     }
 
+    /**
+     * Updates an existing user's details in the system.
+     *
+     * @param id the unique identifier of the user to update
+     * @param user the updated user information
+     * @return the updated user, or a not found response if the user with the specified ID doesn't exist
+     */
     @PutMapping("/users/{id}")
     public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User user) {
         Optional<User> userData = userRepository.findById(id);
@@ -81,6 +104,12 @@ public class UserController {
         }
     }
 
+    /**
+     * Deletes a user from the system.
+     *
+     * @param id the unique identifier of the user to be deleted
+     * @return a 204 status code if the deletion is successful, or an error message if the deletion fails
+     */
     @DeleteMapping("/users/{id}")
     public ResponseEntity<HttpStatus> deleteUser(@PathVariable("id") long id) {
         try {

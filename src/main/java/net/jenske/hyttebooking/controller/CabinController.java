@@ -18,7 +18,11 @@ public class CabinController {
 
     @Autowired
     CabinRepository cabinRepository;
-
+    /**
+     * Retrieves all cabins available in the system.
+     *
+     * @return a list of cabins or an empty list if no cabin is found
+     */
     @GetMapping("/cabins")
     public ResponseEntity<List<Cabin>> getAllCabins(@RequestParam(required = false) String name) {
         try {
@@ -39,6 +43,12 @@ public class CabinController {
         }
     }
 
+    /**
+     * Retrieves a single cabin by its unique identifier.
+     *
+     * @param id the unique identifier of the cabin to be retrieved
+     * @return the cabin with the specified ID or a not found response if it doesn't exist
+     */
     @GetMapping("/cabins/{id}")
     public ResponseEntity<Cabin> getCabinById(@PathVariable("id") long id) {
         try {
@@ -54,6 +64,12 @@ public class CabinController {
         }
     }
 
+    /**
+     * Creates a new booking in the system.
+     *
+     * @param booking the booking object to be created
+     * @return the created booking with a 201 status code, or an error message if creation fails
+     */
     @PostMapping("/cabins")
     public ResponseEntity<Cabin> createCabin(@RequestBody Cabin cabin) {
         try {
@@ -65,6 +81,13 @@ public class CabinController {
         }
     }
 
+    /**
+     * Updates an existing cabin.
+     *
+     * @param id the unique identifier of the cabin to update
+     * @param cabinDetails the updated cabin information
+     * @return the updated cabin, or a 404 status if the cabin with the specified ID is not found
+     */
     @PutMapping("/cabins/{id}")
     public ResponseEntity<Cabin> updateCabin(@PathVariable("id") long id, @RequestBody Cabin cabinDetails) {
         Optional<Cabin> cabinData = cabinRepository.findById(id);
@@ -88,7 +111,12 @@ public class CabinController {
         }
     }
 
-
+    /**
+     * Deletes a cabin from the system.
+     *
+     * @param id the unique identifier of the cabin to be deleted
+     * @return a 204 status code if the deletion is successful, or an error message if the deletion fails
+     */
     @DeleteMapping("/cabins/{id}")
     public ResponseEntity<HttpStatus> deleteCabin(@PathVariable("id") long id) {
         try {

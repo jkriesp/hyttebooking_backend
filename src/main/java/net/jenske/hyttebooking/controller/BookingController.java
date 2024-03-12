@@ -62,32 +62,28 @@ public class BookingController {
     @PostMapping("/bookings")
     public ResponseEntity<?> createBooking(@RequestBody Booking booking) {
         try {
-            // Check if the referenced cabin exists
             Cabin cabin = cabinRepository.findById(booking.getCabin().getCabinId())
                     .orElseThrow(() -> new Exception("Cabin not found with id: " + booking.getCabin().getCabinId()));
 
-            // Check if the referenced user exists
             User user = userRepository.findById(booking.getUser().getUserId())
                     .orElseThrow(() -> new Exception("User not found with id: " + booking.getUser().getUserId()));
 
-            // Before creating a new Booking, ensure the references to cabin and user are the ones fetched from the database
-            booking.setCabin(cabin);
-            booking.setUser(user);
+            Booking newBooking = new Booking(
+                    booking.getStartDate(),
+                    booking.getEndDate(),
+                    booking.getStatus(),
+                    booking.getTitle(),
+                    cabin,  // Use the fetched cabin
+                    user    // Use the fetched user
+            );
 
-            // Create and save the booking
-            Booking _booking = bookingRepository
-                    .save(new Booking(
-                            booking.getStartDate(),
-                            booking.getEndDate(),
-                            booking.getStatus(),
-                            booking.getTitle(),
-                            booking.getCabin(),
-                            booking.getUser()));
-            return new ResponseEntity<>(_booking, HttpStatus.CREATED);
+            Booking savedBooking = bookingRepository.save(newBooking);
+            return new ResponseEntity<>(savedBooking, HttpStatus.CREATED);
         } catch (Exception e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
+
 
     @PutMapping("/bookings/{id}")
     public ResponseEntity<Booking> updateBooking(@PathVariable("id") long id, @RequestBody Booking bookingDetails) {

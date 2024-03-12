@@ -9,6 +9,6 @@ import java.util.Optional;
 
 @Repository
 public interface CabinRepository extends JpaRepository<Cabin, Long> {
-    Collection<Cabin> findByTitleContaining(String title);
+    Collection<Cabin> findByNameContaining(String name);
     Optional<Cabin> findById(long cabinId);
 }

@@ -1,5 +1,7 @@
 package net.jenske.hyttebooking.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.time.LocalDate;
@@ -12,18 +14,18 @@ public class Booking {
     private long bookingId;
 
     private LocalDate startDate;
-
     private LocalDate endDate;
-
     private String status;
     private String title;
 
     @ManyToOne
     @JoinColumn(name = "cabinId") // This is the foreign key
+    @JsonBackReference("cabin-booking")
     private Cabin cabin;
 
     @ManyToOne
     @JoinColumn(name = "userId") // This is the foreign key
+    @JsonBackReference("user-booking")
     private User user;
 
     public Booking() {
@@ -35,6 +37,7 @@ public class Booking {
         this.status = status;
         this.cabin = cabin;
         this.user = user;
+        this.title = title;
     }
 
     public String getTitle() {

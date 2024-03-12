@@ -1,5 +1,6 @@
 package net.jenske.hyttebooking.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.util.List;
@@ -19,6 +20,7 @@ public class User {
     // other fields as needed
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference("user-booking")
     private List<Booking> bookings; // A user can have multiple bookings
 
     // Constructors, getters, and setters

@@ -55,7 +55,7 @@ public class UserController {
         }
     }
 
-    @GetMapping("/users")
+    @PostMapping("/users")
     public ResponseEntity<User> createUser(@RequestBody User user) {
         try {
             User _user = userRepository

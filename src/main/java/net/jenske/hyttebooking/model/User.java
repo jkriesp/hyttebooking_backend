@@ -2,6 +2,8 @@ package net.jenske.hyttebooking.model;
 
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -11,11 +13,14 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
+    @NotBlank(message = "First Name is required")
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     private String firstName;
 
-
-
+    @NotBlank(message = "Last Name is required")
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     private String lastName;
+    @NotBlank(message = "Email is required")
     private String email;
     // other fields as needed
 

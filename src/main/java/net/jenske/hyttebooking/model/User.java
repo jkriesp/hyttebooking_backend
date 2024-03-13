@@ -1,6 +1,10 @@
 package net.jenske.hyttebooking.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -10,11 +14,20 @@ public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long userId;
-    private String name;
+    @NotBlank(message = "First Name is required")
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    private String firstName;
+
+    @NotBlank(message = "Last Name is required")
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
+    private String lastName;
+    @NotBlank(message = "Email is required")
+    @Email(message = "Email must be a valid email address")
     private String email;
     // other fields as needed
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference("user-booking")
     private List<Booking> bookings; // A user can have multiple bookings
 
     // Constructors, getters, and setters
@@ -22,8 +35,9 @@ public class User {
     public User() {
     }
 
-    public User(String name, String email) {
-        this.name = name;
+    public User(String firstName, String lastName, String email) {
+        this.firstName = firstName;
+        this.lastName = lastName;
         this.email = email;
     }
 
@@ -33,16 +47,24 @@ public class User {
         return userId;
     }
 
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
+
     public void setUserId(long userId) {
         this.userId = userId;
     }
 
-    public String getName() {
-        return name;
+    public String getFirstName() {
+        return firstName;
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
     }
 
     public String getEmail() {
@@ -63,6 +85,6 @@ public class User {
 
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", name=" + name + ", email=" + email + "]";
+        return "User [userId=" + userId + ", firstName=" + firstName + ", email=" + email + "]";
     }
 }

@@ -1,6 +1,9 @@
 package net.jenske.hyttebooking.model;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Size;
 
 import java.util.List;
 
@@ -10,13 +13,18 @@ public class Cabin {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long cabinId;
+    @NotBlank(message = "Name is required")
+    @Size(min = 2, max = 50, message = "Name must be between 2 and 50 characters")
     private String name;
+    @NotBlank(message = "Location is required")
     private String location;
+    @NotBlank(message = "Description is required")
     private String description;
     private boolean visible;
     private int numberOfBeds;
 
     @OneToMany(mappedBy = "cabin")
+    @JsonManagedReference("cabin-booking")
     private List<Booking> bookings;
 
     public Cabin() {

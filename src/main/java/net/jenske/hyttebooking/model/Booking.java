@@ -1,6 +1,11 @@
 package net.jenske.hyttebooking.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDate;
 
@@ -11,32 +16,42 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long bookingId;
 
-    @Column
+    @NotNull(message = "Start date is required: yyyy-mm-dd")
     private LocalDate startDate;
-
-    @Column
+    @NotNull(message = "End date is required: yyyy-mm-dd")
     private LocalDate endDate;
-
-    @Column
     private String status;
+    @NotBlank(message = "Title is required: `Family vacation` or `Hiking trip` or `Skiing trip` or `Other")
+    private String title;
 
     @ManyToOne
     @JoinColumn(name = "cabinId") // This is the foreign key
+    @JsonBackReference("cabin-booking")
     private Cabin cabin;
 
     @ManyToOne
     @JoinColumn(name = "userId") // This is the foreign key
+    @JsonBackReference("user-booking")
     private User user;
 
     public Booking() {
     }
 
-    public Booking(LocalDate startDate, LocalDate endDate, String status, Cabin cabin, User user) {
+    public Booking(LocalDate startDate, LocalDate endDate, String status, String title , Cabin cabin, User user) {
         this.startDate = startDate;
         this.endDate = endDate;
         this.status = status;
         this.cabin = cabin;
         this.user = user;
+        this.title = title;
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public long getBookingId() {

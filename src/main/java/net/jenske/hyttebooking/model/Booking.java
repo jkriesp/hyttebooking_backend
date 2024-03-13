@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
 import org.springframework.boot.context.properties.bind.DefaultValue;
 
 import java.time.LocalDate;
@@ -15,9 +16,9 @@ public class Booking {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long bookingId;
 
-    @NotBlank(message = "Start date is required: yyyy-mm-dd")
+    @NotNull(message = "Start date is required: yyyy-mm-dd")
     private LocalDate startDate;
-    @NotBlank(message = "End date is required: yyyy-mm-dd")
+    @NotNull(message = "End date is required: yyyy-mm-dd")
     private LocalDate endDate;
     private String status;
     @NotBlank(message = "Title is required: `Family vacation` or `Hiking trip` or `Skiing trip` or `Other")

@@ -1,5 +1,6 @@
 package net.jenske.hyttebooking.controller;
 
+import jakarta.validation.Valid;
 import net.jenske.hyttebooking.controller.exception.ResourceNotFoundException;
 import net.jenske.hyttebooking.model.User;
 import net.jenske.hyttebooking.repository.UserRepository;
@@ -65,7 +66,7 @@ public class UserController {
      * @return the newly created user with a 201 status code, or an error message if the creation fails
      */
     @PostMapping("/users")
-    public ResponseEntity<User> createUser(@RequestBody User user) {
+    public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         try {
             User _user = userRepository
                     .save(new User(user.getFirstName(), user.getLastName(), user.getEmail()));
@@ -83,7 +84,7 @@ public class UserController {
      * @return the updated user, or a not found response if the user with the specified ID doesn't exist
      */
     @PutMapping("/users/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable("id") long id, @RequestBody User user) {
+    public ResponseEntity<User> updateUser(@Valid @PathVariable("id") long id, @RequestBody User user) {
         Optional<User> userData = userRepository.findById(id);
 
         if (userData.isPresent()) {

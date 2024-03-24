@@ -1,5 +1,6 @@
 package net.jenske.hyttebooking.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
 
 @Entity
@@ -11,10 +12,12 @@ public class UserCabinRelation {
 
     @ManyToOne
     @JoinColumn(name = "userId", nullable = false)
+    @JsonBackReference("user-cabin-relation")
     private User user;
 
     @ManyToOne
     @JoinColumn(name = "cabinId", nullable = false)
+    @JsonBackReference("cabin-user-relation")
     private Cabin cabin;
 
     public UserCabinRelation() {

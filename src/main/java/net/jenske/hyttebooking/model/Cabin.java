@@ -28,6 +28,7 @@ public class Cabin {
     private List<Booking> bookings;
 
     @OneToMany(mappedBy = "cabin")
+    @JsonManagedReference("cabin-user-relation")
     private List<UserCabinRelation> userCabinRelations;
 
     public Cabin() {

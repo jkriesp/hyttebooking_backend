@@ -31,6 +31,7 @@ public class User {
     private List<Booking> bookings; // A user can have multiple bookings
 
     @OneToMany(mappedBy = "user")
+    @JsonManagedReference("user-cabin-relation")
     private List<UserCabinRelation> userCabinRelations;
 
     // Constructors, getters, and setters

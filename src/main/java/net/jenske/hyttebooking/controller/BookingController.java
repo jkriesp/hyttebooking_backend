@@ -5,13 +5,16 @@ import net.jenske.hyttebooking.controller.exception.ResourceNotFoundException;
 import net.jenske.hyttebooking.model.Booking;
 import net.jenske.hyttebooking.model.Cabin;
 import net.jenske.hyttebooking.model.User;
+import net.jenske.hyttebooking.model.UserCabinRelation;
 import net.jenske.hyttebooking.repository.BookingRepository;
 import net.jenske.hyttebooking.repository.CabinRepository;
 import net.jenske.hyttebooking.repository.UserRepository;
+import net.jenske.hyttebooking.repository.UserCabinRelationRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,6 +32,9 @@ public class BookingController {
 
     @Autowired
     private UserRepository userRepository;
+
+    @Autowired
+    UserCabinRelationRepository userCabinRelationRepository;
 
     /**
      * Retrieves all bookings optionally filtered by title.
@@ -76,6 +82,16 @@ public class BookingController {
      */
     @PostMapping("/bookings")
     public ResponseEntity<?> createBooking(@Valid @RequestBody Booking booking) {
+        // Check if a UserCabinRelation exists for the given User and Cabin
+        Optional<UserCabinRelation> userCabinRelation = userCabinRelationRepository.findByUser_UserIdAndCabin_CabinId(
+                booking.getUser().getUserId(),
+                booking.getCabin().getCabinId()
+        );
+
+        if (userCabinRelation.isEmpty()) {
+            throw new ResourceNotFoundException("User does not have an active relation with the cabin");
+        }
+
         try {
             Cabin cabin = cabinRepository.findById(booking.getCabin().getCabinId())
                     .orElseThrow(() -> new ResourceNotFoundException("Cabin not found with id: " + booking.getCabin().getCabinId()));
@@ -95,7 +111,7 @@ public class BookingController {
             Booking savedBooking = bookingRepository.save(newBooking);
             return new ResponseEntity<>(savedBooking, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ResourceNotFoundException(e.getMessage());
         }
     }
 

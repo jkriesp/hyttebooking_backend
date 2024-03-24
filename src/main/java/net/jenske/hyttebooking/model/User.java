@@ -30,6 +30,9 @@ public class User {
     @JsonManagedReference("user-booking")
     private List<Booking> bookings; // A user can have multiple bookings
 
+    @OneToMany(mappedBy = "user")
+    private List<UserCabinRelation> userCabinRelations;
+
     // Constructors, getters, and setters
 
     public User() {
@@ -55,10 +58,6 @@ public class User {
         this.lastName = lastName;
     }
 
-    public void setUserId(long userId) {
-        this.userId = userId;
-    }
-
     public String getFirstName() {
         return firstName;
     }
@@ -81,6 +80,14 @@ public class User {
 
     public void setBookings(List<Booking> bookings) {
         this.bookings = bookings;
+    }
+
+    public List<UserCabinRelation> getUserCabinRelations() {
+        return userCabinRelations;
+    }
+
+    public void setUserCabinRelations(List<UserCabinRelation> userCabinRelations) {
+        this.userCabinRelations = userCabinRelations;
     }
 
     @Override

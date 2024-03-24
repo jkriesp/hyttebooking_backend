@@ -27,6 +27,9 @@ public class Cabin {
     @JsonManagedReference("cabin-booking")
     private List<Booking> bookings;
 
+    @OneToMany(mappedBy = "cabin")
+    private List<UserCabinRelation> userCabinRelations;
+
     public Cabin() {
 
     }
@@ -91,6 +94,14 @@ public class Cabin {
 
     public void setNumberOfBeds(int numberOfBeds) {
         this.numberOfBeds = numberOfBeds;
+    }
+
+    public List<UserCabinRelation> getUserCabinRelations() {
+        return userCabinRelations;
+    }
+
+    public void setUserCabinRelations(List<UserCabinRelation> userCabinRelations) {
+        this.userCabinRelations = userCabinRelations;
     }
 
     @Override

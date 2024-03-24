@@ -73,7 +73,7 @@ public class UserController {
                     .save(new User(user.getFirstName(), user.getLastName(), user.getEmail()));
             return new ResponseEntity<>(_user, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ResourceNotFoundException(e.getMessage());
         }
     }
 

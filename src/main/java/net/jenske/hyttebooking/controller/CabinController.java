@@ -58,10 +58,10 @@ public class CabinController {
     }
 
     /**
-     * Creates a new booking in the system.
+     * Creates a new Cabin in the system.
      *
-     * @param booking the booking object to be created
-     * @return the created booking with a 201 status code, or an error message if creation fails
+     * @param cabin the booking object to be created
+     * @return the created Cabin with a 201 status code, or an error message if creation fails
      */
     @PostMapping("/cabins")
     public ResponseEntity<Cabin> createCabin(@RequestBody Cabin cabin) {
@@ -70,7 +70,7 @@ public class CabinController {
                     .save(new Cabin(cabin.getName(), cabin.getLocation(), cabin.getDescription(), cabin.isVisible(), cabin.getNumberOfBeds()));
             return new ResponseEntity<>(_cabin, HttpStatus.CREATED);
         } catch (Exception e) {
-            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+            throw new ResourceNotFoundException(e.getMessage());
         }
     }
 
@@ -97,7 +97,7 @@ public class CabinController {
                 Cabin updatedCabin = cabinRepository.save(_cabin);
                 return new ResponseEntity<>(updatedCabin, HttpStatus.OK);
             } catch (Exception e) {
-                return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+                throw new ResourceNotFoundException(e.getMessage());
             }
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);

@@ -69,8 +69,12 @@ public class UserController {
     @PostMapping("/users")
     public ResponseEntity<User> createUser(@Valid @RequestBody User user) {
         try {
+            Optional<User> existingUser = userRepository.findByEmail(user.getEmail());
+            if (existingUser.isPresent()) {
+                return new ResponseEntity<>(existingUser.get(), HttpStatus.OK); // User already exists
+            }
             User _user = userRepository
-                    .save(new User(user.getFirstName(), user.getLastName(), user.getEmail()));
+                    .save(new User(user.getFirstName(), user.getLastName(), user.getEmail(), user.getSub()));
             return new ResponseEntity<>(_user, HttpStatus.CREATED);
         } catch (Exception e) {
             throw new ResourceNotFoundException(e.getMessage());

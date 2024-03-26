@@ -24,7 +24,8 @@ public class User {
     @NotBlank(message = "Email is required")
     @Email(message = "Email must be a valid email address")
     private String email;
-    // other fields as needed
+
+    private String sub; // Field to store the Auth0 sub value
 
     @OneToMany(mappedBy = "user")
     @JsonManagedReference("user-booking")
@@ -39,13 +40,18 @@ public class User {
     public User() {
     }
 
-    public User(String firstName, String lastName, String email) {
+    public User(String firstName, String lastName, String email, String sub) {
         this.firstName = firstName;
         this.lastName = lastName;
         this.email = email;
+        this.sub = sub;
     }
 
     // Getters and setters for all fields
+
+    public void setUserId(long userId) {
+        this.userId = userId;
+    }
 
     public long getUserId() {
         return userId;
@@ -91,8 +97,16 @@ public class User {
         this.userCabinRelations = userCabinRelations;
     }
 
+    public String getSub() {
+        return sub;
+    }
+
+    public void setSub(String sub) {
+        this.sub = sub;
+    }
+
     @Override
     public String toString() {
-        return "User [userId=" + userId + ", firstName=" + firstName + ", email=" + email + "]";
+        return "User [userId=" + userId + ", firstName=" + firstName + ", lastName=" + lastName + ", email=" + email + ", sub=" + sub + "]";
     }
 }

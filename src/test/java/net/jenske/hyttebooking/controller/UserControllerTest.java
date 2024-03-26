@@ -31,7 +31,7 @@ public class UserControllerTest {
     public void testGetUserById() throws Exception {
         // Given
         long userId = 1L;  // Simulate an auto-generated ID
-        User mockUser = new User("John", "Doe", "john.doe@example.com");
+        User mockUser = new User("John", "Doe", "john.doe@example.com", "uniquesubwihtnumbers1003");
         mockUser.setUserId(userId);
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));
 
@@ -41,7 +41,8 @@ public class UserControllerTest {
                 .andExpect(jsonPath("$.userId").value(userId))
                 .andExpect(jsonPath("$.firstName").value("John"))
                 .andExpect(jsonPath("$.lastName").value("Doe"))
-                .andExpect(jsonPath("$.email").value("john.doe@example.com"));
+                .andExpect(jsonPath("$.email").value("john.doe@example.com"))
+                .andExpect(jsonPath("$.sub").value("uniquesubwihtnumbers1003"));
         // Verify mockUser being called once
         verify(userRepository, times(1)).findById(userId);
     }
@@ -61,7 +62,7 @@ public class UserControllerTest {
     @Test
     public void testGetAllUsers() throws Exception {
         // Given
-        User mockUser = new User("John", "Doe", "johndoe@example.com");
+        User mockUser = new User("John", "Doe", "john.doe@example.com", "uniquesubwihtnumbers1003");
         when(userRepository.findAll()).thenReturn(List.of(mockUser));
 
         // When & Then
@@ -69,7 +70,8 @@ public class UserControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].firstName").value("John"))
                 .andExpect(jsonPath("$[0].lastName").value("Doe"))
-                .andExpect(jsonPath("$[0].email").value("johndoe@example.com"));
+                .andExpect(jsonPath("$[0].email").value("johndoe@example.com"))
+                .andExpect(jsonPath("$.sub").value("uniquesubwihtnumbers1003"));
     }
 
     @Test
@@ -83,18 +85,20 @@ public class UserControllerTest {
     }
 
     @Test
-    public void testCreateUser() throws Exception{
+    public void testCreateUser() throws Exception {
         // Given
-        User mockUser = new User("John", "Doe", "john.doe@example.com");
+        String sub = "uniquesubwihtnumbers1003"; // The sub value from Auth0
+        User mockUser = new User("John", "Doe", "john.doe@example.com", sub);
         when(userRepository.save(any(User.class))).thenReturn(mockUser);
 
         // When & Then
         mockMvc.perform(post("/api/users")
                 .contentType("application/json")
-                .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john.doe@example.com\"}"));
+                .content("{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"john.doe@example.com\",\"sub\":\"" + sub + "\"}"));
 
         verify(userRepository, times(1)).save(any(User.class));
     }
+
 
     @Test
     public void testCreateUserWithInvalidData() throws Exception {
@@ -124,15 +128,16 @@ public class UserControllerTest {
     public void testUpdateUser() throws Exception {
         // Given
         long userId = 1L;  // Example user ID
-        User existingUser = new User("John", "Doe", "john.doe@example.com");
+        String sub = "uniquesubwihtnumbers1003"; // The sub value from Auth0
+        User existingUser = new User("John", "Doe", "john.doe@example.com", sub);
         existingUser.setUserId(userId);
-        User updatedUser = new User("John", "Doe", "new.email@example.com");
+        User updatedUser = new User("John", "Doe", "new.email@example.com", sub);
         updatedUser.setUserId(userId);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(existingUser));
         when(userRepository.save(any(User.class))).thenReturn(updatedUser);
 
-        String updatedUserJson = "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"new.email@example.com\"}";
+        String updatedUserJson = "{\"firstName\":\"John\",\"lastName\":\"Doe\",\"email\":\"new.email@example.com\",\"sub\":\"" + sub + "\"}";
 
         // When & Then
         mockMvc.perform(put("/api/users/{id}", userId)
@@ -144,10 +149,12 @@ public class UserControllerTest {
         verify(userRepository).save(any(User.class));  // Verify that userRepository.save() was called
     }
 
+
     @Test
     public void testDeleteUser() throws Exception {
         long userId = 1L;
-        User mockUser = new User("John", "Doe", "john.doe@example.com");
+        String sub = "uniquesubwihtnumbers1003"; // The sub value from Auth0
+        User mockUser = new User("John", "Doe", "john.doe@example.com", sub);
         mockUser.setUserId(userId);
 
         when(userRepository.findById(userId)).thenReturn(Optional.of(mockUser));

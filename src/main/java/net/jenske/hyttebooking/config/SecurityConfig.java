@@ -18,15 +18,24 @@ public class SecurityConfig {
         // TODO - configure RBAC for our API endpoints
         return http
                 .authorizeHttpRequests((authorize) -> authorize
+                        // Permit access to H2 console without authentication
+                        .requestMatchers("/h2-console/**").permitAll()
                         // All /api/ endpoints require authentication
                         .requestMatchers("/api/**").authenticated()
                         .requestMatchers("/api/bookings/**").hasAuthority("SCOPE_write:bookings") // Specific scope for bookings
                         .requestMatchers("/api/cabins/**", "/api/users/**").hasAuthority("SCOPE_crud:admin") // Admin scope for cabins and users
+                        .anyRequest().authenticated() // Ensure other requests are authenticated
                 )
                 .cors(withDefaults())
+                .csrf(csrf -> csrf
+                        .ignoringRequestMatchers("/h2-console/**") // Correct method to ignore CSRF for specific paths
+                )
+                .headers(headers -> headers.frameOptions().sameOrigin()
+                )
                 .oauth2ResourceServer(oauth2 -> oauth2
                         .jwt(withDefaults())
                 )
                 .build();
     }
+
 }

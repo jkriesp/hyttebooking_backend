@@ -81,8 +81,7 @@ public class BookingController {
      * @return the newly created booking with a 201 status code, or an error message if the creation fails
      */
     @PostMapping("/bookings")
-    public ResponseEntity<?> createBooking(@Valid @RequestBody Booking booking) {
-        // Check if a UserCabinRelation exists for the given User and Cabin
+    public ResponseEntity<Booking> createBooking(@Valid @RequestBody Booking booking) {
         Optional<UserCabinRelation> userCabinRelation = userCabinRelationRepository.findByUser_UserIdAndCabin_CabinId(
                 booking.getUser().getUserId(),
                 booking.getCabin().getCabinId()
@@ -104,16 +103,18 @@ public class BookingController {
                     booking.getEndDate(),
                     booking.getStatus(),
                     booking.getTitle(),
-                    cabin,  // Use the fetched cabin
-                    user    // Use the fetched user
+                    cabin,
+                    user
             );
 
             Booking savedBooking = bookingRepository.save(newBooking);
             return new ResponseEntity<>(savedBooking, HttpStatus.CREATED);
         } catch (Exception e) {
+            // Consider more specific exception handling based on the context of the error
             throw new ResourceNotFoundException(e.getMessage());
         }
     }
+
 
     /**
      * Updates an existing booking.
